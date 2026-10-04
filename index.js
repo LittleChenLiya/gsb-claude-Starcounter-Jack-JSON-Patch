@@ -1,8 +1,7 @@
 var core = require("./commonjs/core.js");
-Object.assign(exports, core);
-
 var duplex = require("./commonjs/duplex.js");
-Object.assign(exports, duplex);
+var subscription = require("./commonjs/subscription.js");
+Object.assign(exports, core, duplex, subscription);
 
 var helpers = require("./commonjs/helpers.js");
 exports.JsonPatchError = helpers.PatchError;

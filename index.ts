@@ -1,5 +1,6 @@
 export * from './src/core';
 export * from './src/duplex';
+export * from './src/subscription';
 export {
     PatchError as JsonPatchError,
     _deepClone as deepClone,
@@ -14,6 +15,7 @@ export {
 
 import * as core from './src/core';
 import * as duplex from './src/duplex';
+import * as subscription from './src/subscription';
 import {
     PatchError as JsonPatchError,
     _deepClone as deepClone,
@@ -24,6 +26,7 @@ import {
 export default {
     ...core,
     ...duplex,
+    ...subscription,
     JsonPatchError,
     deepClone,
     escapePathComponent,

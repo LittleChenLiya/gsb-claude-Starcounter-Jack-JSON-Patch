@@ -1,5 +1,6 @@
 export * from './module/core';
 export * from './module/duplex';
+export * from './module/subscription';
 export {
     PatchError as JsonPatchError,
     _deepClone as deepClone,
@@ -13,6 +14,7 @@ export {
  */
 import * as core from './module/core';
 import * as duplex from './module/duplex';
+import * as subscription from './module/subscription';
 import { PatchError as JsonPatchError, _deepClone as deepClone, escapePathComponent, unescapePathComponent } from './module/helpers';
 declare const _default: {
     JsonPatchError: typeof JsonPatchError;
@@ -30,5 +32,6 @@ declare const _default: {
     validator(operation: core.Operation, index: number, document?: any, existingPathFragment?: string): void;
     validate<T>(sequence: core.Operation[], document?: T, externalValidator?: core.Validator<T>): JsonPatchError;
     _areEquals(a: any, b: any): boolean;
+    SubscriptionContainer: typeof subscription.SubscriptionContainer;
 };
 export default _default;
