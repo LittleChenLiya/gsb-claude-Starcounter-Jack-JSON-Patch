@@ -60,6 +60,7 @@
         "test-core": "node --experimental-modules jasmine-run.mjs 'test/spec/{jsonPatchTestsSpec,coreSpec,validateSpec}.mjs'",
         "bench": "npm run bench-core && npm run bench-duplex",
         "bench-core": "node test/spec/coreBenchmark.js",
-        "bench-duplex": "node test/spec/coreBenchmark.js && node test/spec/duplexBenchmark.js"
+        "bench-duplex": "node test/spec/coreBenchmark.js && node test/spec/duplexBenchmark.js",
+        "test-subscription": "node test/subscriptionSpec.js"
     }
 }

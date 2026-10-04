@@ -426,3 +426,21 @@ We aim the tests to be fair. Our library puts performance as the #1 priority, wh
 ## License
 
 MIT
+
+## Path subscription container
+
+`subscription.js` adds a prefix-subscription container on top of the core
+patch functions: callers subscribe to JSON Pointer prefixes, and submitting a
+batch of operations notifies only the affected subscribers — once each, with
+the matching operation indices. Array insertions/removals shift later index
+subscriptions, `move` affects both its source and target, replacing a parent
+notifies descendant subscriptions, and a failing batch changes nothing and
+notifies nobody. See [docs/SUBSCRIPTION.md](docs/SUBSCRIPTION.md) for the
+full affect rules, and run the small-state demo with
+`node examples/subscription-demo.js` (tests: `npm run test-subscription`).
+
+```js
+const container = jsonpatch.createSubscriptionContainer({ items: ["a", "b"] });
+container.subscribe("/items/1", (event) => console.log(event.indices));
+container.applyPatch([{ op: "remove", path: "/items/0" }]); // notifies /items/1
+```

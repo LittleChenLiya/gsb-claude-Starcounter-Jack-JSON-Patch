@@ -9,3 +9,6 @@ exports.JsonPatchError = helpers.PatchError;
 exports.deepClone = helpers._deepClone;
 exports.escapePathComponent = helpers.escapePathComponent;
 exports.unescapePathComponent = helpers.unescapePathComponent;
+
+var subscription = require("./subscription.js");
+exports.createSubscriptionContainer = subscription.createSubscriptionContainer;
