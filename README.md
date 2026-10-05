@@ -426,3 +426,90 @@ We aim the tests to be fair. Our library puts performance as the #1 priority, wh
 ## License
 
 MIT
+
+## Patch commit log (small WAL)
+
+`src/patchLog.js` is a tiny append-only patch commit log (JSONL) built on top
+of this library. It records consecutive sequence numbers, the pre-state
+summary (`prev`), the patch, the post-state summary (`next`) and a checksum
+(`h`). The original state is bound to the log identity:
+`logId = sha256(canonical(initial state))`.
+
+### Commit protocol
+
+1. The patch is first applied to a **copy** of the state. If it fails,
+   nothing is written and the state is untouched.
+2. The record is appended to the log file and **fsync'd**. Only after the
+   full record is on disk is the in-memory state published.
+3. A failed or torn write is rolled back to the last fully-persisted offset
+   and is **never counted as committed**.
+
+### Idempotency and sequence numbers
+
+- Re-submitting the same sequence number with the **same** patch returns the
+  **original receipt**; the patch is not applied again and no record is
+  written.
+- The same sequence number with a **different** patch is rejected
+  (`SEQ_CONFLICT`).
+- Sequence numbers must be **consecutive**; any gap is rejected
+  (`SEQ_GAP`).
+
+### Recovery rules
+
+- Replay starts from the original state; every record is verified:
+  checksum, `logId`, sequence continuity, `prev` against the replayed state
+  and `next` against the state after applying the patch.
+- Only the **last, incomplete (torn-write) tail record** may be ignored: it
+  is truncated and recovery proceeds up to the previous record.
+- Any **intermediate** bad record (bad checksum, sequence gap, mismatched
+  `prev`/`next`, mismatched `logId`) is fatal: recovery stops and the state
+  is never published. A complete-but-corrupt tail record is fatal too.
+
+### Node commands
+
+All paths may point to the D: drive:
+
+```bash
+# create a log bound to the original state
+node bin/patchlog.js init    D:\logs\my.jsonl D:\data\state.json
+
+# apply a patch (applied to a copy first, persisted, then published)
+node bin/patchlog.js apply   D:\logs\my.jsonl D:\data\state.json D:\data\patch.json
+
+# idempotent retry: same seq + same patch returns the original receipt
+node bin/patchlog.js apply   D:\logs\my.jsonl D:\data\state.json D:\data\patch.json --seq 1
+
+# recover: replay the log; a torn tail is ignored and truncated
+node bin/patchlog.js recover D:\logs\my.jsonl D:\data\state.json
+
+# strict read-only verification (never truncates)
+node bin/patchlog.js verify  D:\logs\my.jsonl D:\data\state.json
+
+# print log identity, last sequence and state hash
+node bin/patchlog.js status  D:\logs\my.jsonl D:\data\state.json
+```
+
+### Recovery procedure
+
+1. Run `recover <logfile> <state.json>` with the original state.
+2. If a torn tail was found it is truncated automatically; the output reports
+   `tornTail` and the restored state.
+3. If the command fails with `LOG_CORRUPT`, do not use the log: an
+   intermediate record is corrupt and the state was not published. Restore
+   the log file from a known-good backup, or discard it and re-create it with
+   `init`.
+4. A failed `apply` (`COMMIT_IO_ERROR` / `COMMIT_TORN`) never committed:
+   retry the same request (same sequence number) — the file has already been
+   rolled back to the last good record.
+
+### Tests
+
+```bash
+npm run test-patchlog
+```
+
+The acceptance tests (`test/patchLogSpec.js`) are small, deterministic and
+dependency-free; all fixtures are written to a temp directory on the D:
+drive inside the worktree (`test/.tmp-patchlog-test/`) and removed
+afterwards.
+

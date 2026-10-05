@@ -27,3 +27,6 @@ test/spec/typings/typingsSpec.js
 *.log
 
 .artifacts
+
+# Patch log acceptance test fixtures (D: drive worktree temp dir)
+test/.tmp-patchlog-test/
