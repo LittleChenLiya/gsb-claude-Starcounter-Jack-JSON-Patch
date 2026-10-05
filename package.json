@@ -25,6 +25,9 @@
     "main": "index.js",
     "module": "index.mjs",
     "typings": "index.d.ts",
+    "bin": {
+        "signed-patch": "./bin/signed-patch.mjs"
+    },
     "devDependencies": {
         "benchmark": "^2.1.4",
         "bluebird": "^3.5.5",
@@ -60,6 +63,8 @@
         "test-core": "node --experimental-modules jasmine-run.mjs 'test/spec/{jsonPatchTestsSpec,coreSpec,validateSpec}.mjs'",
         "bench": "npm run bench-core && npm run bench-duplex",
         "bench-core": "node test/spec/coreBenchmark.js",
-        "bench-duplex": "node test/spec/coreBenchmark.js && node test/spec/duplexBenchmark.js"
+        "bench-duplex": "node test/spec/coreBenchmark.js && node test/spec/duplexBenchmark.js",
+        "seal-example": "node examples/sealing-example.mjs",
+        "signed-patch": "node bin/signed-patch.mjs"
     }
 }

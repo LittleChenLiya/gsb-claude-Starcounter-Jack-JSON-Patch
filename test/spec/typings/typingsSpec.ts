@@ -20,3 +20,26 @@ const test_applyPatch = applyPatch(document, typedPatch).newDocument;
 
 // the below line would NOT compile with TSC
 // const test_applyPatch = applyPatch(document, untypedPatch).newDocument;
+// Signed patch package typings
+import {
+    SIGNED_PATCH_PROTOCOL,
+    SignedPatchBackend,
+    SealedPatchPackage,
+    ApplySignedPatchResult,
+    canonicalEncode,
+    sealPatch,
+    verifySignedPatch,
+    applySignedPatch
+} from '../../..';
+
+const signedBackend: SignedPatchBackend = {
+    digest(canonical: string): string { return canonical; },
+    sign(canonical: string): string { return canonical; },
+    verify(canonical: string, signature: string): boolean { return canonical === signature; }
+};
+
+const sealedPkg: Promise<SealedPatchPackage> = sealPatch(document, typedPatch, signedBackend);
+const canonicalText: string = canonicalEncode(document);
+const verifiedPkg: Promise<void> = verifySignedPatch(document, {} as SealedPatchPackage, signedBackend);
+const appliedPkg: Promise<ApplySignedPatchResult<typeof document>> = applySignedPatch(document, {} as SealedPatchPackage, signedBackend);
+const protocolVersion: string = SIGNED_PATCH_PROTOCOL;

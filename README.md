@@ -346,6 +346,39 @@ else {
 }
 ```
 
+## Signed Patch Package
+
+A signed patch package is a self-contained, tamper-evident envelope that explicitly carries the **encoding protocol version**, the **baseline digest**, the **complete patch**, and a **signature**. Signing and verification are handled by an *injected* backend (`SignedPatchBackend`), so the core has no crypto dependency and the same code runs in the browser, in Node, or against a remote signing service / HSM.
+
+The canonical encoding sorts object keys (so semantically equal documents always encode identically) but preserves array order (so reordering patch operations changes the encoding). Non-JSON values and unsafe integers are rejected. Verification always runs before apply: a tampered package or a baseline mismatch leaves the document unchanged and reports `applied: 0`.
+
+```ts
+import { sealPatch, applySignedPatch, canonicalEncode, SIGNED_PATCH_PROTOCOL } from 'fast-json-patch';
+
+// A backend provides digest(), sign() and verify(). The in-memory fixture
+// (test/spec/signedPatchFixture.mjs) implements one with node:crypto Ed25519.
+const backend = createMemoryBackend();
+
+const doc = { a: 1, b: { c: 2 } };
+const patch = [{ op: 'replace', path: '/a', value: 42 }];
+
+// Seal: produces { protocol, baseline, patch, signature }.
+const pkg = await sealPatch(doc, patch, backend);
+
+// Apply: verifies signature + baseline first, then applies.
+const result = await applySignedPatch(doc, pkg, backend);
+// result.ok === true, result.applied === 2, doc.a === 42
+
+// Tamper with the package or change the baseline -> result.ok === false, result.applied === 0, doc unchanged.
+```
+
+The sealed patch is a detached copy: mutating the original `patch` array after sealing does not affect the sealed package. The default `applyPatch` behaviour is unchanged.
+
+- Encoding protocol specification: [`SIGNED_PATCH_PROTOCOL.md`](SIGNED_PATCH_PROTOCOL.md)
+- Sealing example: [`examples/sealing-example.mjs`](examples/sealing-example.mjs) — run with `npm run seal-example`
+- Node command: `node bin/signed-patch.mjs <keygen|seal|apply|digest>` (or `npm run signed-patch -- ...`)
+- In-memory signature fixture: [`test/spec/signedPatchFixture.mjs`](test/spec/signedPatchFixture.mjs)
+
 ## `OperationResult` Type
 
 Functions `applyPatch` and `applyOperation` both return `OperationResult` object. This object is:
