@@ -27,3 +27,7 @@ test/spec/typings/typingsSpec.js
 *.log
 
 .artifacts
+
+# Durable commit log tests (D: drive scratch)
+.tmp-commitlog/
+.tmp-manual/
