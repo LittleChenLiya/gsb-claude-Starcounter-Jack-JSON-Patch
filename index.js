@@ -4,6 +4,9 @@ Object.assign(exports, core);
 var duplex = require("./commonjs/duplex.js");
 Object.assign(exports, duplex);
 
+var signedPatch = require("./commonjs/signedPatch.js");
+Object.assign(exports, signedPatch);
+
 var helpers = require("./commonjs/helpers.js");
 exports.JsonPatchError = helpers.PatchError;
 exports.deepClone = helpers._deepClone;

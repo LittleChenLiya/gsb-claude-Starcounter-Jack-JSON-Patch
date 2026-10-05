@@ -394,6 +394,18 @@ See the [ECMAScript spec](http://www.ecma-international.org/ecma-262/6.0/index.h
 
  - [Run in browser](http://starcounter-jack.github.io/JSON-Patch/test/)
 
+## Signed patch packages
+
+Explicitly signed patch packages (canonical encoding protocol
+`fast-json-patch.signed/1`, baseline digest, full patch, injected
+sign/verify backends, verify-before-apply) are documented in
+[docs/signed-patch.md](docs/signed-patch.md). Try them with:
+
+```bash
+node test/spec/signedPatchSpec.mjs   # deterministic spec
+node examples/sealSignedPatch.mjs    # sealing example
+```
+
 ## [Contributing](CONTRIBUTING.md)
 
 ## Changelog

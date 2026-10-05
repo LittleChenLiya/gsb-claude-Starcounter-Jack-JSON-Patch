@@ -58,6 +58,7 @@
         "test-typings": "tsc test/spec/typings/typingsSpec.ts",
         "test-duplex": "node --experimental-modules jasmine-run.mjs test/**/*[sS]pec.mjs",
         "test-core": "node --experimental-modules jasmine-run.mjs 'test/spec/{jsonPatchTestsSpec,coreSpec,validateSpec}.mjs'",
+        "test-signed": "node test/spec/signedPatchSpec.mjs && node examples/sealSignedPatch.mjs",
         "bench": "npm run bench-core && npm run bench-duplex",
         "bench-core": "node test/spec/coreBenchmark.js",
         "bench-duplex": "node test/spec/coreBenchmark.js && node test/spec/duplexBenchmark.js"

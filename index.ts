@@ -1,5 +1,6 @@
 export * from './src/core';
 export * from './src/duplex';
+export * from './src/signedPatch';
 export {
     PatchError as JsonPatchError,
     _deepClone as deepClone,

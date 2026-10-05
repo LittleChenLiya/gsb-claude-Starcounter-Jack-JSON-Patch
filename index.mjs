@@ -1,5 +1,6 @@
 export * from './module/core.mjs';
 export * from './module/duplex.mjs';
+export * from './module/signedPatch.mjs';
 export {
     PatchError as JsonPatchError,
     _deepClone as deepClone,
